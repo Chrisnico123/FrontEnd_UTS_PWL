@@ -1,9 +1,54 @@
+import axios from "axios";
+
 import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
 const AddProductModals = ({ isOpen, onCloseAdd }) => {
   const [open, setOpen] = useState(true);
   const cancelButtonRef = useRef(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    stok: "",
+    description: "",
+    cart: 1,
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const addProduct = () => {
+    const productData = {
+      name: formData.name,
+      price: formData.price,
+      stok: formData.stok,
+      description: formData.description,
+      cart: formData.cart,
+    };
+
+    // Konversi data menjadi JSON
+    const jsonData = JSON.stringify(productData);
+
+    // Konfigurasi tipe konten permintaan sebagai "application/json"
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    // Kirim permintaan POST untuk menambahkan produk ke server
+    axios
+      .post("http://127.0.0.1:6543/product", jsonData, config)
+      .then((response) => {
+        // Produk berhasil ditambahkan
+        console.log("Product added:", response.data);
+        // onCloseAdd();
+      })
+      .catch((error) => {
+        console.error("Error adding product:", error);
+      });
+  };
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -29,7 +74,7 @@ const AddProductModals = ({ isOpen, onCloseAdd }) => {
                     <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Add Product</h2>
                   </div>
                   <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                    <form className="space-y-6" action="#" method="POST">
+                    <form className="space-y-6" onSubmit={addProduct}>
                       <div>
                         <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">
                           Name Product
@@ -40,6 +85,8 @@ const AddProductModals = ({ isOpen, onCloseAdd }) => {
                             name="name"
                             type="name"
                             autoComplete="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
                             required
                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                           />
@@ -55,25 +102,47 @@ const AddProductModals = ({ isOpen, onCloseAdd }) => {
                             name="price"
                             type="price"
                             autoComplete="price"
+                            value={formData.price}
+                            onChange={handleInputChange}
                             required
                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                           />
                         </div>
-                        <label htmlFor="desc" className="block text-sm font-medium leading-6 text-gray-900">
-                          Description
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            id="desc"
-                            name="desc"
-                            type="desc"
-                            autoComplete="desc"
-                            required
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                          />
+                        <div>
+                          <label htmlFor="stok" className="block text-sm font-medium leading-6 text-gray-900">
+                            Stock
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              id="stok"
+                              name="stok"
+                              type="stok"
+                              value={formData.stok}
+                              autoComplete="stok"
+                              onChange={handleInputChange}
+                              required
+                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label htmlFor="description" className="block text-sm font-medium leading-6 text-gray-900">
+                            Description
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              id="description"
+                              name="description"
+                              type="description"
+                              autoComplete="description"
+                              value={formData.description}
+                              onChange={handleInputChange}
+                              required
+                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            />
+                          </div>
                         </div>
                       </div>
-
                       <div>
                         <button
                           type="submit"
